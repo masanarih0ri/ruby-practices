@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'etc'
 require 'date'
 
@@ -25,28 +27,28 @@ class LsFile
 
   PREVIOUS_YEAR_DISPLAY_MONTH = 6
 
-  def initialize(file_path)
+  def initialize(file_path, options)
     @file = File.open(file_path)
     @stat = @file.stat
+    @file_list = LsFileList.new(options)
   end
 
   def long_text
-    data = LsFileList.property_max_sizes
-    # これはmapでFileListから呼び出される想定なので、ここで余白の調整が必要
-    # TODO rjustとかljustを使って右詰、左詰をする
+    max_sizes = @file_list.property_max_sizes
     [
-      adjust_view(file_mode, 2), 
-      adjust_view(file_nlink, 1),
-      adjust_view(file_user, 2),
-      adjust_view(file_group, 2),
-      adjust_view(file_size, 1),
-      adjust_view(file_date, 1),
-      adjust_view(file_name, 0)
+      format_text(file_mode, 2),
+      format_text(file_nlink, 1).rjust(max_sizes['file_nlink']),
+      format_text(file_user, 2).ljust(max_sizes['file_user']),
+      format_text(file_group, 2).ljust(max_sizes['file_group']),
+      format_text(file_size, 1).rjust(max_sizes['file_size'] + 1),
+      format_text(file_date, 1),
+      format_text(file_name, 0)
     ].join
   end
 
   def short_text
-    "#{file_name}"
+    # ljustの調整が必要
+    format_text(file_name, 2)
   end
 
   def blocks
@@ -71,8 +73,8 @@ class LsFile
 
   private
 
-  def adjust_view(property, right_padding)
-    property + (" " * right_padding)
+  def format_text(property, right_padding)
+    property + (' ' * right_padding)
   end
 
   def file_mode
@@ -106,7 +108,7 @@ class LsFile
     today = Date.today
 
     if mtime.to_date <= today.prev_month(PREVIOUS_YEAR_DISPLAY_MONTH)
-      "#{mtime.month} #{mtime.day} #{mtime.year}"
+      "#{mtime.month} #{mtime.day} #{mtime.year.to_s.rjust(5, ' ')}"
     else
       "#{mtime.month.to_s.rjust(2, ' ')} #{mtime.day.to_s.rjust(2, ' ')} #{mtime.hour.to_s.rjust(2, '0')}:#{mtime.min.to_s.rjust(2, '0')}"
     end

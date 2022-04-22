@@ -1,17 +1,16 @@
+# frozen_string_literal: true
 
 require 'optparse'
 require_relative 'ls_file_list'
 
 class Ls
-  # lsコマンドを実行するためのクラス
   def initialize(argv)
     @file_list = LsFileList.new(argv.getopts('alr'))
   end
-  
+
   def execute
-    puts @file_list.output
+    print "#{@file_list.output}\n"
   end
 end
 
-# puts ARGV.getopts('alr')
 Ls.new(ARGV).execute
