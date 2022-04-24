@@ -12,30 +12,31 @@ class LsFileList
   end
 
   def output
-    @options['l'] ? long_text : short_text
+    display_text = @options['l'] ? display_long_text : display_short_text
+    puts display_text
   end
 
   def property_max_sizes
     max_sizes = {}
-    max_sizes['file_nlink'] = files.map(&:file_nlink_count).max
-    max_sizes['file_user'] = files.map(&:file_user_count).max
-    max_sizes['file_group'] = files.map(&:file_group_count).max
-    max_sizes['file_size'] = files.map(&:file_size_count).max
+    max_sizes['nlink'] = ls_files.map(&:nlink_count).max
+    max_sizes['user'] = ls_files.map(&:user_name_count).max
+    max_sizes['group'] = ls_files.map(&:group_name_count).max
+    max_sizes['size'] = ls_files.map(&:byte_size_count).max
 
     max_sizes
   end
 
   private
 
-  def long_text
-    [total, *files.map(&:long_text)].join("\n")
+  def display_long_text
+    ["total #{blocks}", *ls_files.map(&:long_text)].join("\n")
   end
 
-  def short_text
-    short_text_files = files.map(&:short_text)
-    file_count_per_column = file_count_per_column(short_text_files)
+  def display_short_text
+    short_texts = ls_files.map(&:short_text)
+    file_count_per_column = (ls_files.size.to_f / COLUMN_COUNT).ceil
 
-    divided_files = short_text_files.each_slice(file_count_per_column).to_a
+    divided_files = short_texts.each_slice(file_count_per_column).to_a
 
     last_column = divided_files[-1]
     (file_count_per_column - last_column.size).times do
@@ -51,24 +52,16 @@ class LsFileList
     transposed_files.map(&:join).join("\n")
   end
 
-  def total
-    "total #{blocks}"
-  end
-
   def blocks
-    files.sum(&:blocks)
+    ls_files.sum(&:blocks)
   end
 
-  def files
-    @files ||= file_paths.map { |file_path| LsFile.new(file_path, @options) }
+  def ls_files
+    @ls_files ||= file_paths.map { |file_path| LsFile.new(file_path, @options) }
   end
 
   def file_paths
     target_files = @options['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
     @options['r'] ? target_files.reverse : target_files
-  end
-
-  def file_count_per_column(files)
-    (files.size.to_f / COLUMN_COUNT).ceil
   end
 end

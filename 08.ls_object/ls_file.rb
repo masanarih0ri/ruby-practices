@@ -4,7 +4,7 @@ require 'etc'
 require 'date'
 
 class LsFile
-  FILE_TYPE = {
+  FILE_TYPES = {
     '01' => 'p',
     '02' => 'c',
     '04' => 'd',
@@ -14,7 +14,7 @@ class LsFile
     '14' => 's'
   }.freeze
 
-  FILE_ACCESS_RIGHTS = {
+  FILE_ACCESS_PERMISSIONS = {
     '0' => '---',
     '1' => '--x',
     '2' => '-w-',
@@ -25,10 +25,10 @@ class LsFile
     '7' => 'rwx'
   }.freeze
 
-  PREVIOUS_YEAR_DISPLAY_MONTH = 6
+  YEAR_DISPLAY_MONTH = 6
 
   def initialize(file_path, options)
-    @file = File.open(file_path)
+    @file = File.new(file_path)
     @stat = @file.stat
     @file_list = LsFileList.new(options)
   end
@@ -36,70 +36,69 @@ class LsFile
   def long_text
     max_sizes = @file_list.property_max_sizes
     [
-      format_text(file_mode, 2),
-      format_text(file_nlink, 1).rjust(max_sizes['file_nlink']),
-      format_text(file_user, 2).ljust(max_sizes['file_user']),
-      format_text(file_group, 2).ljust(max_sizes['file_group']),
-      format_text(file_size, 1).rjust(max_sizes['file_size'] + 1),
-      format_text(file_date, 1),
-      format_text(file_name, 0)
+      adjust_text_margin(file_mode, 2),
+      adjust_text_margin(nlink, 1).rjust(max_sizes['nlink']),
+      adjust_text_margin(user_name, 2).ljust(max_sizes['user']),
+      adjust_text_margin(group_name, 2).ljust(max_sizes['group']),
+      adjust_text_margin(byte_size, 1).rjust(max_sizes['size'] + 1),
+      adjust_text_margin(file_date, 1),
+      adjust_text_margin(file_name, 0)
     ].join
   end
 
   def short_text
-    # ljustの調整が必要
-    format_text(file_name, 2)
+    adjust_text_margin(file_name, 2)
   end
 
   def blocks
     @stat.blocks
   end
 
-  def file_nlink_count
-    file_nlink.size
+  def nlink_count
+    nlink.size
   end
 
-  def file_user_count
-    file_user.size
+  def user_name_count
+    user_name.size
   end
 
-  def file_group_count
-    file_group.size
+  def group_name_count
+    group_name.size
   end
 
-  def file_size_count
-    file_size.size
+  def byte_size_count
+    byte_size.size
   end
 
   private
 
-  def format_text(property, right_padding)
-    property + (' ' * right_padding)
+  def adjust_text_margin(property, right_margin)
+    property + (' ' * right_margin)
   end
 
   def file_mode
     mode = @stat.mode.to_s(8)
     mode = mode[0] == '1' ? mode : format('%06d', mode).to_s
-    file_type = FILE_TYPE[mode.slice(0, 2)]
-    file_access_right_user = FILE_ACCESS_RIGHTS[mode.slice(3)]
-    file_access_right_group = FILE_ACCESS_RIGHTS[mode.slice(4)]
-    file_access_right_other = FILE_ACCESS_RIGHTS[mode.slice(5)]
-    "#{file_type}#{file_access_right_user}#{file_access_right_group}#{file_access_right_other}"
+    type = FILE_TYPES[mode.slice(0, 2)]
+    access_permission_user = FILE_ACCESS_PERMISSIONS[mode.slice(3)]
+    access_permission_group = FILE_ACCESS_PERMISSIONS[mode.slice(4)]
+    access_permission_other = FILE_ACCESS_PERMISSIONS[mode.slice(5)]
+    "#{type}#{access_permission_user}#{access_permission_group}#{access_permission_other}"
   end
 
-  def file_nlink
+  def nlink
     @stat.nlink.to_s
   end
 
-  def file_user
+  def user_name
     Etc.getpwuid(@stat.uid).name
   end
 
-  def file_group
+  def group_name
     Etc.getgrgid(@stat.gid).name
   end
 
-  def file_size
+  def byte_size
     @stat.size.to_s
   end
 
@@ -107,10 +106,10 @@ class LsFile
     mtime = @stat.mtime
     today = Date.today
 
-    if mtime.to_date <= today.prev_month(PREVIOUS_YEAR_DISPLAY_MONTH)
-      "#{mtime.month} #{mtime.day} #{mtime.year.to_s.rjust(5, ' ')}"
+    if mtime.to_date <= today.prev_month(YEAR_DISPLAY_MONTH)
+      mtime.strftime('%_m %e  %Y')
     else
-      "#{mtime.month.to_s.rjust(2, ' ')} #{mtime.day.to_s.rjust(2, ' ')} #{mtime.hour.to_s.rjust(2, '0')}:#{mtime.min.to_s.rjust(2, '0')}"
+      mtime.strftime('%_m %e %H:%M')
     end
   end
 
