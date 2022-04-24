@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'io/console'
 require_relative 'ls_file'
 require 'optparse'
 
