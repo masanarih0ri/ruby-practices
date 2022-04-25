@@ -27,14 +27,14 @@ class LsFile
 
   YEAR_DISPLAY_MONTH = 6
 
-  def initialize(file_path, options)
+  def initialize(file_path, ls_instance)
     @file = File.new(file_path)
     @stat = @file.stat
-    @file_list = LsFileList.new(options)
+    @ls_instance = ls_instance
   end
 
   def long_text
-    max_sizes = @file_list.property_max_sizes
+    max_sizes = @ls_instance.property_max_sizes
     [
       adjust_text_margin(file_mode, 2),
       adjust_text_margin(nlink, 1).rjust(max_sizes['nlink']),
