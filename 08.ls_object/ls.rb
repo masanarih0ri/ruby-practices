@@ -11,8 +11,8 @@ class Ls
   end
 
   def output
-    display_text = @options['l'] ? display_long_text : display_short_text
-    puts display_text
+    text = @options['l'] ? display_long_text : display_short_text
+    puts text
   end
 
   def property_max_sizes
