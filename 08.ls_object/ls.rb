@@ -63,7 +63,5 @@ class Ls
   end
 end
 
-# file_list = LsFileList.new(ARGV.getopts('alr'))
-# file_list.output
 ls = Ls.new(ARGV.getopts('alr'))
 ls.output
