@@ -36,22 +36,6 @@ class LsFile
     @stat.blocks
   end
 
-  def nlink_count
-    nlink.size
-  end
-
-  def user_name_count
-    user_name.size
-  end
-
-  def group_name_count
-    group_name.size
-  end
-
-  def byte_size_count
-    byte_size.size
-  end
-
   def file_mode
     mode = @stat.mode.to_s(8)
     mode = mode[0] == '1' ? mode : format('%06d', mode).to_s

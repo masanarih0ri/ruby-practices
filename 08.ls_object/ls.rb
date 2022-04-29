@@ -39,10 +39,10 @@ class Ls
 
   def property_max_sizes
     max_sizes = {}
-    max_sizes['nlink'] = ls_files.map(&:nlink_count).max
-    max_sizes['user'] = ls_files.map(&:user_name_count).max
-    max_sizes['group'] = ls_files.map(&:group_name_count).max
-    max_sizes['size'] = ls_files.map(&:byte_size_count).max
+    max_sizes['nlink'] = ls_files.map { |lf| lf.nlink.to_s.size }.max
+    max_sizes['user'] = ls_files.map { |lf| lf.user_name.size }.max
+    max_sizes['group'] = ls_files.map { |lf| lf.group_name.size }.max
+    max_sizes['size'] = ls_files.map { |lf| lf.byte_size.to_s.size }.max
 
     max_sizes
   end
