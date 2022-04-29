@@ -25,8 +25,6 @@ class LsFile
     '7' => 'rwx'
   }.freeze
 
-  YEAR_DISPLAY_MONTH = 6
-
   def initialize(file_path)
     @file = File.new(file_path)
     @stat = @file.stat
@@ -62,15 +60,8 @@ class LsFile
     @stat.size
   end
 
-  def file_date
-    mtime = @stat.mtime
-    today = Date.today
-
-    if mtime.to_date <= today.prev_month(YEAR_DISPLAY_MONTH)
-      mtime.strftime('%_m %e  %Y')
-    else
-      mtime.strftime('%_m %e %H:%M')
-    end
+  def mtime
+    @stat.mtime
   end
 
   def file_name

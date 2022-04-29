@@ -5,6 +5,8 @@ require_relative 'ls_file'
 
 COLUMN_COUNT = 3
 
+YEAR_DISPLAY_MONTH = 6
+
 class Ls
   def initialize(options)
     @options = options
@@ -24,7 +26,7 @@ class Ls
       adjust_text_margin(ls_file.user_name, 2).ljust(max_sizes['user']),
       adjust_text_margin(ls_file.group_name, 2).ljust(max_sizes['group']),
       adjust_text_margin(ls_file.byte_size, 1).rjust(max_sizes['size'] + 1),
-      adjust_text_margin(ls_file.file_date, 1),
+      adjust_text_margin(format_date(ls_file.mtime), 1),
       adjust_text_margin(ls_file.file_name, 0)
     ].join
   end
@@ -35,6 +37,16 @@ class Ls
 
   def adjust_text_margin(property, right_margin)
     property.to_s + (' ' * right_margin)
+  end
+
+  def format_date(mtime)
+    today = Date.today
+
+    if mtime.to_date <= today.prev_month(YEAR_DISPLAY_MONTH)
+      mtime.strftime('%_m %e  %Y')
+    else
+      mtime.strftime('%_m %e %H:%M')
+    end
   end
 
   def property_max_sizes
