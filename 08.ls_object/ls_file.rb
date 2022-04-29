@@ -71,7 +71,7 @@ class LsFile
   private
 
   def adjust_text_margin(property, right_margin)
-    property + (' ' * right_margin)
+    property.to_s + (' ' * right_margin)
   end
 
   def file_mode
@@ -85,7 +85,7 @@ class LsFile
   end
 
   def nlink
-    @stat.nlink.to_s
+    @stat.nlink
   end
 
   def user_name
@@ -97,7 +97,7 @@ class LsFile
   end
 
   def byte_size
-    @stat.size.to_s
+    @stat.size
   end
 
   def file_date
