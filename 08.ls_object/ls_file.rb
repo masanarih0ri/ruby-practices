@@ -32,22 +32,6 @@ class LsFile
     @stat = @file.stat
   end
 
-  def long_text(max_sizes)
-    [
-      adjust_text_margin(file_mode, 2),
-      adjust_text_margin(nlink, 1).rjust(max_sizes['nlink']),
-      adjust_text_margin(user_name, 2).ljust(max_sizes['user']),
-      adjust_text_margin(group_name, 2).ljust(max_sizes['group']),
-      adjust_text_margin(byte_size, 1).rjust(max_sizes['size'] + 1),
-      adjust_text_margin(file_date, 1),
-      adjust_text_margin(file_name, 0)
-    ].join
-  end
-
-  def short_text
-    adjust_text_margin(file_name, 2)
-  end
-
   def blocks
     @stat.blocks
   end
@@ -66,12 +50,6 @@ class LsFile
 
   def byte_size_count
     byte_size.size
-  end
-
-  private
-
-  def adjust_text_margin(property, right_margin)
-    property.to_s + (' ' * right_margin)
   end
 
   def file_mode
