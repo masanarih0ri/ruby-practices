@@ -15,6 +15,8 @@ class Ls
     puts text
   end
 
+  private
+
   def property_max_sizes
     max_sizes = {}
     max_sizes['nlink'] = ls_files.map(&:nlink_count).max
@@ -26,7 +28,7 @@ class Ls
   end
 
   def display_long_text
-    ["total #{blocks}", *ls_files.map(&:long_text)].join("\n")
+    ["total #{blocks}", *ls_files.map { |ls_file| ls_file.long_text(property_max_sizes)}].join("\n")
   end
 
   def display_short_text
@@ -54,7 +56,7 @@ class Ls
   end
 
   def ls_files
-    @ls_files ||= file_paths.map { |file_path| LsFile.new(file_path, self.class.new(@options)) }
+    @ls_files ||= file_paths.map { |file_path| LsFile.new(file_path) }
   end
 
   def file_paths
