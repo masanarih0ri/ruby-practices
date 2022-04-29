@@ -28,7 +28,8 @@ class Ls
   end
 
   def display_long_text
-    ["total #{blocks}", *ls_files.map { |ls_file| ls_file.long_text(property_max_sizes)}].join("\n")
+    max_sizes = property_max_sizes
+    ["total #{blocks}", *ls_files.map { |ls_file| ls_file.long_text(max_sizes)}].join("\n")
   end
 
   def display_short_text
